@@ -100,10 +100,22 @@ public:
                 operating_array[k] = operating_array[k-1];
             }
             operating_array[i] = new_entry;
+
+            cout<<"Successfully added and entry: "<<endl;
+            cout<<month<<"/"<<date<<"      "<<amount<<endl;
         
         }
     }
-
+    // for manual input new entries
+    void replace_entry(Entry input, int id){
+        operating_array[id] = input;
+    }
+    // to replace a specific entry
+    void append_entry(Entry input){
+        operating_array[array_size] = input;
+        array_size++;
+    }
+    // to append an entry onto an existed Entry_Array
 };
 
 /*Entry New_Entry(){
@@ -169,8 +181,14 @@ void Print_All_Entry(Entry_Array input){
     }
 }
 
+void Print_Entry(Entry_Array input, int id){
+    cout<<"date: "<<input.get_month(id)<<"/"<<input.get_date(id)<<endl;
+    cout<<"amount: "<<input.get_amount(id)<<endl;
+}//print out the content of id
+
 void Save_To_Text(Entry_Array input){
-    std :: fstream ouput_text("result.txt", std :: fstream :: out);
+    std :: fstream ouput_text("result.txt", ios :: out);
+    ouput_text<<input.get_array_size()<<endl;
     for (int i = 0; i < input.get_array_size(); i++){
         ouput_text<<i<<endl;
         ouput_text<<input.get_amount(i)<<endl;
@@ -178,21 +196,84 @@ void Save_To_Text(Entry_Array input){
         ouput_text<<input.get_date(i)<<endl;
     }
     ouput_text.close();
+    cout<<"Succesfully saved to file as result.txt"<<endl;
+}
+
+Entry_Array Read_From_Text(void){
+    Entry_Array input_result;//the final result of reading the file
+    Entry temp;//the temptation Entry obj. for moving files
+    int input_size; // the array_size of the input Entry_Array
+    int a;//temp for amount
+    int m;//temp for month
+    int d;//temp for date
+    int crap;
+
+    std :: fstream input_text("result.txt", ios :: in);
+    input_text>>input_size;
+
+    for (int i = 0; i < input_size; i++){
+        input_text>>crap;
+        input_text>>a;
+        input_text>>m;
+        input_text>>d;
+        temp.Set_Entry(a, m, d);
+        input_result.append_entry(temp);
+    }
+    input_text.close();
+
+    return input_result;
 }
 
 
 
 int main(void){
     Entry_Array data;
-    //initialize the array
-    //int array_size = 0;
-    data.add_entry();
-    data.add_entry();
-    data.add_entry();
-    data.add_entry();
 
+    bool quit = false;
+    char read = 'Y';
+    int option = 0;
+    cout<<"Read from file?[Y/N]"<<endl;
+    cout<<"=============WARNING============"<<endl;
+    cout<<"May overwrite existed files "<<endl;
+    cout<<"=============WARNING============"<<endl;
+    cin >> read;
+    if ((read != 'N')&&(read != 'n')){
+        data = Read_From_Text();
+    }
+    
+    while(!quit){
+        cout<<"Choose the operation 1: add entry 2:save 3:save & quit 4: don't save & quit"<<endl;
+        cin >> option;
+        switch (option){
+            case 1:
+                data.add_entry();
+                break;
+            case 2:
+                Save_To_Text(data);
+                break;
+            case 3:
+                cout<<"Are you sure?[Y/N]"<<endl;
+                char sure;
+                cin>>sure;
+                if((sure == 'Y')||(sure == 'y')){
+                    Save_To_Text(data);
+                    quit = true;
+                }
+                break;
+            case 4:
+                cout<<"Are you sure? Type 'sure' to quit"<<endl;
+                string sure_drop;
+                cin>>sure_drop;
+                if(sure_drop=="sure"){
+                    quit = true;
+                }
+                break;
+        }
+
+    }
+    //data = Read_From_Text();
     Print_All_Entry(data);
-    Save_To_Text(data);
+    //Save_To_Text(data);
     char wait;
     cin>>wait;  
     return 0;
