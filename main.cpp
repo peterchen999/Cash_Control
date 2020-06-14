@@ -172,19 +172,18 @@ public:
 }*/
 //function is been replaced by "add_entry()" in Entry_Array Class
 
-void Print_All_Entry(Entry_Array input){
-    for (int i = 0; i < input.get_array_size(); i++){
-        cout<<"Entry no."<<i<<endl;
-        cout<<"amount = "<<input.get_amount(i)<<endl;
-        cout<<"month = "<<input.get_month(i)<<endl;
-        cout<<"date = "<<input.get_date(i)<<endl;
-    }
-}
-
 void Print_Entry(Entry_Array input, int id){
     cout<<"date: "<<input.get_month(id)<<"/"<<input.get_date(id)<<endl;
     cout<<"amount: "<<input.get_amount(id)<<endl;
+    cout<<endl;
 }//print out the content of id
+
+void Print_All_Entry(Entry_Array input){
+    int i = 0;
+    for (; i < input.get_array_size(); i++){
+        Print_Entry(input, i);
+    }
+}
 
 void Save_To_Text(Entry_Array input){
     std :: fstream ouput_text("result.txt", ios :: out);
@@ -224,7 +223,98 @@ Entry_Array Read_From_Text(void){
     return input_result;
 }
 
+void Report_Balance(Entry_Array input){
+    int balance = -1;
+    int initial_balance = -1;
+    int month;//the month when the user asks for report
+    int date; // the date when the user asks for report
+    char init = 'N';
+    cout<<"initialize balance[Y/N]?(default = 0)"<<endl;
+    cin>>init;
+    if ((init == 'Y')||(init == 'y')){
+        cout<<"Please enter current balance"<<endl;
+        cin>>balance;
+    }
+    else{
+        balance = 0;
+    }//let the user to decide whether to initialize the balance
+    initial_balance = balance;
 
+    cout<<"Please enter the month"<<endl;
+    cin>>month;
+    cout<<"Please enter the date"<<endl;
+    cin>>date;
+    //let the user set the month&date
+    
+    int current_date_sum = month*31+date;
+    int i;
+
+    for (i = 0; i < input.get_array_size(); i++){
+        int entry_date_sum = input.get_month(i)*31+input.get_date(i);
+        if(current_date_sum < entry_date_sum){
+            break;
+        }
+        else if (current_date_sum == entry_date_sum){
+            break;
+        }
+    }//find the correct id to start with the report
+
+    int save_i = i; 
+
+    for (; i < input.get_array_size(); i++){
+        int balance_temp = balance + input.get_amount(i);
+        Print_Entry(input, i);
+        if (balance_temp<0){
+            cout<<"======================"<<endl;
+            cout<<"======================"<<endl;
+            cout<<"        WARNING       "<<endl;
+            cout<<"$"<<balance_temp<<"("<<balance<<"->"<<balance_temp<<")"<<endl<<endl;
+            cout<<"======================"<<endl;
+            cout<<"======================"<<endl;
+        }
+        else{
+            cout<<"$"<<balance_temp<<"("<<balance<<"->"<<balance_temp<<")"<<endl<<endl;
+        }
+        balance = balance_temp;
+    }
+    cout<<"all data printed"<<endl;
+    //print out the report
+
+    char save = 'y';
+    cout<<"Save to file?[Y/N]"<<endl;
+    cin>>save;
+    if((save == 'Y')||(save == 'y')){
+        fstream output_report ("report.txt", ios :: out);
+        output_report<<"initial balance: "<<initial_balance<<endl<<endl;
+        //save the inital balance to file
+
+        balance = initial_balance;
+        i = save_i;
+
+        for (; i < input.get_array_size(); i++){
+            int balance_temp = balance + input.get_amount(i);
+            
+            output_report<<"date:"<<input.get_month(i)<<"/"<<input.get_date(i)<<endl;
+            output_report<<"$"<<input.get_amount(i)<<endl;
+
+            if (balance_temp<0){
+                output_report<<"======================"<<endl;
+                output_report<<"======================"<<endl;
+                output_report<<"        WARNING       "<<endl;
+                output_report<<"$"<<balance_temp<<"("<<balance<<"->"<<balance_temp<<")"<<endl<<endl;
+                output_report<<"======================"<<endl;
+                output_report<<"======================"<<endl;
+            }
+            else{
+                output_report<<"$"<<balance_temp<<"("<<balance<<"->"<<balance_temp<<")"<<endl<<endl;
+            }
+            output_report<<endl;
+
+            balance = balance_temp;
+        }
+        output_report<<"all data printed"<<endl;
+    }
+}
 
 int main(void){
     Entry_Array data;
@@ -242,16 +332,22 @@ int main(void){
     }
     
     while(!quit){
-        cout<<"Choose the operation 1: add entry 2:save 3:save & quit 4: don't save & quit"<<endl;
+        cout<<"Choose the operation 1: add entry 2:overview 3:report balance 4:save 5:save & quit 6: don't save & quit"<<endl;
         cin >> option;
         switch (option){
             case 1:
                 data.add_entry();
                 break;
             case 2:
-                Save_To_Text(data);
+                Print_All_Entry(data);
                 break;
             case 3:
+                Report_Balance(data);
+                break;
+            case 4:
+                Save_To_Text(data);
+                break;
+            case 5:
                 cout<<"Are you sure?[Y/N]"<<endl;
                 char sure;
                 cin>>sure;
@@ -260,7 +356,7 @@ int main(void){
                     quit = true;
                 }
                 break;
-            case 4:
+            case 6:
                 cout<<"Are you sure? Type 'sure' to quit"<<endl;
                 string sure_drop;
                 cin>>sure_drop;
