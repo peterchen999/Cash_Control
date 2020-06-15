@@ -113,78 +113,52 @@ public:
             }
             operating_array[i] = new_entry;
 
-            cout<<"Successfully added and entry: "<<endl;
-            cout<<year<<"/"<<month<<"/"<<date<<"      "<<amount<<endl;
+            
         
         }
+        cout<<"Successfully added and entry: "<<endl;
+        cout<<year<<"/"<<month<<"/"<<date<<"      $"<<amount<<endl;
     }
     // for manual input new entries
     void replace_entry(Entry input, int id){
         operating_array[id] = input;
     }
     // to replace a specific entry
+    void replace_entry(int id){
+        int amount;
+        int year;
+        int month;
+        int date;
+        cout<<"correct amount: ";
+        cin>>amount;
+        cout<<"correct year: ";
+        cin>>year;
+        cout<<"correct month: ";
+        cin>>month;
+        cout<<"correct date: ";
+        cin>>date;
+        operating_array[id].Set_Entry(amount, year, month, date);
+        cout<<"successfully modified"<<endl;
+    }
     void append_entry(Entry input){
         operating_array[array_size] = input;
         array_size++;
     }
     // to append an entry onto an existed Entry_Array
+
+    void delete_entry(int id){
+        for (int i = id; i < array_size-1; i++){
+            operating_array[i] = operating_array[i+1];
+        }
+        array_size--;
+    }
+    //to delete the specific entry
 };
 
-/*Entry New_Entry(){
-    int amount;
-    int month;
-    int date;
-    cout<<"amount: ";
-    cin>>amount;
-    cout<<"month: ";
-    cin>>month;
-    cout<<"date: ";
-    cin>>date;
-    
-    Entry new_entry;
-    new_entry.Set_Entry(amount, month, date);
 
-    return new_entry;
-}*/
-//function is been replaced by "add_entry()" in Entry_Array Class
-
-/*void Add_Entry_To_Array(Entry* operating_array, int &array_size, Entry new_entry){
-    if (operating_array == NULL){
-        operating_array[0] = new_entry;
-    }
-    else{
-        int i;
-        int new_entry_date_sum = new_entry.get_month()*31+new_entry.get_date();
-        //find the approximate no. of day of the year
-
-        for (i = 0; i < array_size; i++){
-            int date_sum = operating_array[i].get_month()*31+operating_array[i].get_date();
-            //find the approximate no. of day of the year
-
-            if (new_entry_date_sum == date_sum){
-                i++;
-                break;
-            }
-            else if (new_entry_date_sum < date_sum){
-                break;
-            }
-        }
-        // find the appropriate place to insert new entry
-
-        array_size++;
-
-        for (int k = array_size-1; k > i; k--){
-            operating_array[k] = operating_array[k-1];
-        }
-        operating_array[i] = new_entry;
-        
-    }
-
-    
-}*/
-//function is been replaced by "add_entry()" in Entry_Array Class
 
 void Print_Entry(Entry_Array input, int id){
+    cout<<"id: "<<id<<endl;
     cout<<"date: "<<input.get_year(id)<<"/"<<input.get_month(id)<<"/"<<input.get_date(id)<<endl;
     cout<<"amount: "<<input.get_amount(id)<<endl;
     cout<<endl;
@@ -333,6 +307,8 @@ void Report_Balance(Entry_Array input){
             balance = balance_temp;
         }
         output_report<<"all data printed"<<endl;
+        output_report.close();
+        cout<<"succesfully saved as 'report.txt'"<<endl;
     }
 }
 
@@ -352,22 +328,28 @@ int main(void){
     }
     
     while(!quit){
-        cout<<"Choose the operation 1: add entry 2:overview 3:report balance 4:save 5:save & quit 6: don't save & quit"<<endl;
+        cout<<"Choose the operation 1: add entry 2:modify entry 3:overview 4:report balance 5:save 6:save & quit 7: don't save & quit"<<endl;
         cin >> option;
         switch (option){
             case 1:
                 data.add_entry();
                 break;
             case 2:
-                Print_All_Entry(data);
+                int id;
+                cout<<"the id of entry to be modified?"<<endl;
+                cin>>id;
+                data.replace_entry(id);
                 break;
             case 3:
-                Report_Balance(data);
+                Print_All_Entry(data);
                 break;
             case 4:
-                Save_To_Text(data);
+                Report_Balance(data);
                 break;
             case 5:
+                Save_To_Text(data);
+                break;
+            case 6:
                 cout<<"Are you sure?[Y/N]"<<endl;
                 char sure;
                 cin>>sure;
@@ -376,7 +358,7 @@ int main(void){
                     quit = true;
                 }
                 break;
-            case 6:
+            case 7:
                 cout<<"Are you sure? Type 'sure' to quit"<<endl;
                 string sure_drop;
                 cin>>sure_drop;
@@ -388,9 +370,9 @@ int main(void){
 
     }
     //data = Read_From_Text();
-    Print_All_Entry(data);
+    //Print_All_Entry(data);
     //Save_To_Text(data);
-    char wait;
-    cin>>wait;  
+    //char wait;
+    //cin>>wait;  
     return 0;
 }
