@@ -10,6 +10,7 @@ class Entry{
         int year;
         int month;
         int date;
+        string comment;
 
     public:
         Entry(){
@@ -32,11 +33,16 @@ class Entry{
         int get_date(void){
             return date;
         }
-        void Set_Entry(int a, int y, int m, int d){
+
+        string get_comment(void){
+            return comment;
+        }
+        void Set_Entry(int a, int y, int m, int d, string c = ""){
             amount = a;
             year = y;
             month = m;
             date = d;
+            comment = c;
         }
 };
 
@@ -64,11 +70,16 @@ public:
     int get_date(int id){
         return operating_array[id].get_date();
     }
+    string get_comment(int id){
+        return operating_array[id].get_comment();
+    }
+
     void add_entry(void){
         int amount;
         int year;
         int month;
         int date;
+        string comment;
         
         cout<<"amount: ";
         cin>>amount;
@@ -78,9 +89,11 @@ public:
         cin>>month;
         cout<<"date: ";
         cin>>date;
+        cout<<"comment";
+        cin>>comment;
     
         Entry new_entry;
-        new_entry.Set_Entry(amount, year, month, date);
+        new_entry.Set_Entry(amount, year, month, date, comment);
         //set up the correct entry data
 
         if (array_size == 0){
@@ -117,7 +130,7 @@ public:
         
         }
         cout<<"Successfully added and entry: "<<endl;
-        cout<<year<<"/"<<month<<"/"<<date<<"      $"<<amount<<endl;
+        cout<<year<<"/"<<month<<"/"<<date<<"      $"<<amount<<" comment"<<comment<<endl;
     }
     // for manual input new entries
     void replace_entry(Entry input, int id){
@@ -129,6 +142,7 @@ public:
         int year;
         int month;
         int date;
+        string comment;
         cout<<"correct amount: ";
         cin>>amount;
         cout<<"correct year: ";
@@ -137,7 +151,9 @@ public:
         cin>>month;
         cout<<"correct date: ";
         cin>>date;
-        operating_array[id].Set_Entry(amount, year, month, date);
+        cout<<"correct comment: ";
+        cin>>comment;
+        operating_array[id].Set_Entry(amount, year, month, date, comment);
         cout<<"successfully modified"<<endl;
     }
     void append_entry(Entry input){
@@ -161,6 +177,7 @@ void Print_Entry(Entry_Array input, int id){
     cout<<"id: "<<id<<endl;
     cout<<"date: "<<input.get_year(id)<<"/"<<input.get_month(id)<<"/"<<input.get_date(id)<<endl;
     cout<<"amount: "<<input.get_amount(id)<<endl;
+    cout<<"comment: "<<input.get_comment(id)<<endl;
     cout<<endl;
 }//print out the content of id
 
@@ -180,6 +197,7 @@ void Save_To_Text(Entry_Array input){
         ouput_text<<input.get_year(i)<<endl;
         ouput_text<<input.get_month(i)<<endl;
         ouput_text<<input.get_date(i)<<endl;
+        ouput_text<<input.get_comment(i)<<endl;
     }
     ouput_text.close();
     cout<<"Succesfully saved to file as result.txt"<<endl;
@@ -193,6 +211,7 @@ Entry_Array Read_From_Text(void){
     int y;//temp for year
     int m;//temp for month
     int d;//temp for date
+    string c;//temp for comment;
     int crap;
 
     std :: fstream input_text("result.txt", ios :: in);
@@ -204,7 +223,8 @@ Entry_Array Read_From_Text(void){
         input_text>>y;
         input_text>>m;
         input_text>>d;
-        temp.Set_Entry(a, y, m, d);
+        input_text>>c;
+        temp.Set_Entry(a, y, m, d, c);
         input_result.append_entry(temp);
     }
     input_text.close();
@@ -278,7 +298,12 @@ void Report_Balance(Entry_Array input){
     cout<<"Save to file?[Y/N]"<<endl;
     cin>>save;
     if((save == 'Y')||(save == 'y')){
-        fstream output_report ("report.txt", ios :: out);
+        string report_name;
+        cout<<"Name of the report?"<<endl;
+        cin>>report_name;
+        report_name += ".txt";
+        fstream output_report (report_name.c_str(), ios :: out);
+        output_report<<"reported at: "<<year<<"/"<<month<<"/"<<date<<endl;
         output_report<<"initial balance: "<<initial_balance<<endl<<endl;
         //save the inital balance to file
 
@@ -289,6 +314,7 @@ void Report_Balance(Entry_Array input){
             int balance_temp = balance + input.get_amount(i);
             
             output_report<<"date:"<<input.get_year(i) << "/" << input.get_month(i)<<"/"<<input.get_date(i)<<endl;
+            output_report<<"comment: "<<input.get_comment(i)<<endl;
             output_report<<"$"<<input.get_amount(i)<<endl;
 
             if (balance_temp<0){
@@ -308,7 +334,7 @@ void Report_Balance(Entry_Array input){
         }
         output_report<<"all data printed"<<endl;
         output_report.close();
-        cout<<"succesfully saved as 'report.txt'"<<endl;
+        cout<<"succesfully saved as "<<report_name<<endl;
     }
 }
 
