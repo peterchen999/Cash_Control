@@ -1,6 +1,17 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
+
+namespace patch
+{
+    template < typename T > std::string to_string( const T& n )
+    {
+        std::ostringstream stm ;
+        stm << n ;
+        return stm.str() ;
+    }
+}
 
 using namespace std;
 
@@ -133,43 +144,24 @@ public:
         cout<<"Successfully added an entry: "<<endl;
         cout<<year<<"/"<<month<<"/"<<date<<"      $"<<amount<<" comment: "<<comment<<endl;
     }
-    // for manual input new entries
-    void replace_entry(Entry input, int id){
-        operating_array[id] = input;    
-    }
-    // to replace a specific entry
-    void replace_entry(int id){
-        //this function first deletes the replaced entry, then adds a new entry
-        delete_entry(id);
-        //deletes the replaced entry
-        add_entry();
-        /*
-        int amount;
-        int year;
-        int month;
-        int date;
-        string comment;
-        cout<<"correct amount: ";
-        cin>>amount;
-        cout<<"correct year: ";
-        cin>>year;
-        cout<<"correct month: ";
-        cin>>month;
-        cout<<"correct date: ";
-        cin>>date;
-        cout<<"correct comment: ";
-        cin>>comment;
-        //operating_array[id].Set_Entry(amount, year, month, date, comment);
 
-        Entry new_entry.Set_Entry(amount, year, month, date, comment);
-        //initialize a temporary entry
+    void add_entry(int input_amount, int input_year, int input_month, int input_date, string input_comment){
+        //adds entries with known input
+        int amount = input_amount;
+        int year = input_year;
+        int month = input_month;
+        int date = input_date;
+        string comment = input_comment;
+    
+        Entry new_entry;
+        new_entry.Set_Entry(amount, year, month, date, comment);
+        //set up the correct entry data
 
         if (array_size == 0){
             array_size++;
             operating_array[0] = new_entry;
         }
         else{
-            // array isn't empty, needs to resort the array in increasing time order
             int i;
             int new_entry_date_sum = new_entry.get_year()*366 + new_entry.get_month()*31 + new_entry.get_date();
             //find the approximate no. of day of the year
@@ -198,7 +190,60 @@ public:
             
         
         }
-        */
+        cout<<"Successfully added an entry: "<<endl;
+        cout<<year<<"/"<<month<<"/"<<date<<"      $"<<amount<<" comment: "<<comment<<endl;
+    }
+    void add_monthly_entries(void){
+        int starting_month; //the first month to start monthly entries
+        int total_months; // the total months to repeat the entry
+        int year;
+        int date;
+        int amount;
+        string original_comment;
+        
+        cout<<"warning!! date should be less than 28"<<endl;
+        cout<<"amount: ";
+        cin>>amount;
+        cout<<"starting year: ";
+        cin>>year;
+        cout<<"starting month: ";
+        cin>>starting_month;
+        cout<<"date: ";
+        cin>>date;
+        cout<<"total months: ";
+        cin>>total_months;
+        cout<<"comment: ";
+        cin.ignore();
+        getline(cin, original_comment);
+
+        int current_month = starting_month;
+        // the month to add entry
+
+        for (int i = 0; i < total_months; i++){
+            if (current_month > 12){
+                //resolve current_month > 12
+                year++;
+                current_month = 1;
+            }
+            string comment = patch::to_string(year)+"/"+patch::to_string(current_month)+" "+original_comment;
+            //to show the month and year corresponding to the entry
+            add_entry(amount, year, current_month, date, comment);
+            current_month++;
+        }
+
+    }
+
+    // for manual input new entries
+    void replace_entry(Entry input, int id){
+        operating_array[id] = input;    
+    }
+    // to replace a specific entry
+    void replace_entry(int id){
+        //this function first deletes the replaced entry, then adds a new entry
+        delete_entry(id);
+        //deletes the replaced entry
+        add_entry();
+        
         cout<<"successfully modified"<<endl;
     }
     void append_entry(Entry input){
@@ -208,6 +253,10 @@ public:
     // to append an entry onto an existed Entry_Array
 
     void delete_entry(int id){
+        if (id >= array_size){
+            cout << "invalid id"<<endl;
+            return;
+        }
         for (int i = id; i < array_size-1; i++){
             operating_array[i] = operating_array[i+1];
         }
@@ -399,11 +448,14 @@ int main(void){
     }
     
     while(!quit){
-        cout<<"Choose the operation 1: add entry 2:modify entry 3: delete entry 4:overview 5:report balance 6:save 7:save & quit 8: don't save & quit"<<endl;
+        cout<<"Choose the operation 1: add entry 11: add monthly entry 2:modify entry 3: delete entry 4:overview 5:report balance 6:save 7:save & quit 8: don't save & quit"<<endl;
         cin >> option;
         switch (option){
             case 1:
                 data.add_entry();
+                break;
+            case 11:
+                data.add_monthly_entries();
                 break;
             case 2:
                 Print_All_Entry(data);
@@ -415,7 +467,11 @@ int main(void){
             case 3:
                 Print_All_Entry(data);
                 cout<<"the id of entry to be deleted?"<<endl;
+                cout<<"(to cancel, please enter -1 )"<<endl;
                 cin>>id;
+                if (id == -1){
+                    break;
+                }
                 data.delete_entry(id);
                 break;
             case 4:
