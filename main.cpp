@@ -283,7 +283,24 @@ void Print_All_Entry(Entry_Array input){
 }
 
 void Save_To_Text(Entry_Array input){
-    std :: fstream ouput_text("result.txt", ios :: out);
+    string file_name_temp = "-1";//the file name temp
+    char file_name_default[10] = {'r', 'e', 's', 'u', 'l', 't', '.', 't', 'x', 't'};
+    //rile_name_dafualt = result.txt
+    char* file_name_temp2;
+
+    cout<<"please enter the file name to be saved(for default, please enter -1)"<<endl;
+    cin >> file_name_temp; //input the file name
+
+    if (file_name_temp == "-1"){//test for default setting
+        file_name_temp2 = file_name_default;
+    }
+    else{
+        file_name_temp2 = &file_name_temp[0];
+    }
+
+    const char* file_name = file_name_temp2;//to copy the string into file_name
+
+    std :: fstream ouput_text(file_name, ios :: out);
     ouput_text<<input.get_array_size()<<endl;
     for (int i = 0; i < input.get_array_size(); i++){
         ouput_text<<i<<endl;
