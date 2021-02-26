@@ -307,8 +307,27 @@ Entry_Array Read_From_Text(void){
     int d;//temp for date
     string c;//temp for comment;
     int crap;
-
     std :: fstream input_text("result.txt", ios :: in);
+
+    string file_name_temp = "-1";//the file name temp
+    char file_name_default[10] = {'r', 'e', 's', 'u', 'l', 't', '.', 't', 'x', 't'};
+    //rile_name_dafualt = result.txt
+    char* file_name_temp2;
+
+    cout<< "name of file to be opened?(for default please type -1 to ignore)"<<endl;
+    cin >> file_name_temp; //input the file name
+
+    if (file_name_temp == "-1"){
+        file_name_temp2 = file_name_default;
+    }
+    else{
+        file_name_temp2 = &file_name_temp[0];
+    }
+
+    const char* file_name = file_name_temp2;//to copy the string into file_name
+
+    std :: fstream input_text_customization(file_name, ios :: in);
+    
     input_text>>input_size;
 
     for (int i = 0; i < input_size; i++){
