@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 namespace patch
 {
@@ -12,6 +13,7 @@ namespace patch
         return stm.str() ;
     }
 }
+
 
 using namespace std;
 
@@ -267,12 +269,23 @@ public:
 
 
 
+
 void Print_Entry(Entry_Array input, int id){
+    /*
     cout<<"id: "<<id<<endl;
     cout<<"date: "<<input.get_year(id)<<"/"<<input.get_month(id)<<"/"<<input.get_date(id)<<endl;
     cout<<"amount: "<<input.get_amount(id)<<endl;
     cout<<"comment: "<<input.get_comment(id)<<endl;
     cout<<endl;
+    */
+    cout<<setw(10)<<"id: "<<setw(3)<<id;
+    cout<<setw(6)<<input.get_year(id)<<setw(3)<<input.get_month(id)<<setw(3)<<input.get_date(id);
+    if (input.get_amount(id)>=0){
+        cout<<setw(10)<<input.get_amount(id)<<"          "<<"  "<<input.get_comment(id)<<endl;
+
+    }
+    else
+        cout<<setw(20)<<input.get_amount(id)<<"  "<<input.get_comment(id)<<endl;
 }//print out the content of id
 
 void Print_All_Entry(Entry_Array input){
@@ -329,7 +342,7 @@ Entry_Array Read_From_Text(void){
     string file_name_temp = "-1";//the file name temp
     char file_name_default[10] = {'r', 'e', 's', 'u', 'l', 't', '.', 't', 'x', 't'};
     //rile_name_dafualt = result.txt
-    char* file_name_temp2;
+    char* file_name_temp2 = NULL;
 
     cout<< "name of file to be opened?(for default please type -1 to ignore)"<<endl;
     cin >> file_name_temp; //input the file name
@@ -345,19 +358,22 @@ Entry_Array Read_From_Text(void){
 
     std :: fstream input_text_customization(file_name, ios :: in);
     
-    input_text>>input_size;
+    input_text_customization>>input_size;
 
     for (int i = 0; i < input_size; i++){
-        input_text>>crap;
-        input_text>>a;
-        input_text>>y;
-        input_text>>m;
-        input_text>>d;
-        input_text>>c;
+        input_text_customization>>crap;
+        //cout<<"crap is"<<crap<<endl;
+        input_text_customization>>a;
+        input_text_customization>>y;
+        input_text_customization>>m;
+        input_text_customization>>d;
+        input_text_customization.ignore();//ignore the whitespace
+        getline(input_text_customization, c);
         temp.Set_Entry(a, y, m, d, c);
         input_result.append_entry(temp);
     }
     input_text.close();
+    input_text_customization.close();
 
     return input_result;
 }
@@ -467,6 +483,7 @@ void Report_Balance(Entry_Array input){
         cout<<"succesfully saved as "<<report_name<<endl;
     }
 }
+
 
 int main(void){
     Entry_Array data;
