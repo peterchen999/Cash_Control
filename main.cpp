@@ -342,22 +342,32 @@ Entry_Array Read_From_Text(void){
     string file_name_temp = "-1";//the file name temp
     char file_name_default[10] = {'r', 'e', 's', 'u', 'l', 't', '.', 't', 'x', 't'};
     //rile_name_dafualt = result.txt
-    char* file_name_temp2 = NULL;
+    char* file_name_temp2;
+    bool open_failed = false;//failed to open file
 
-    cout<< "name of file to be opened?(for default please type -1 to ignore)"<<endl;
-    cin >> file_name_temp; //input the file name
+    do{
+        open_failed = false;
+        file_name_temp2 = NULL;
+        //try to open file correctly
+        cout<< "name of file to be opened?"<<endl;
+        getline(cin,file_name_temp); //input the file name
 
-    if (file_name_temp == "-1"){
-        file_name_temp2 = file_name_default;
-    }
-    else{
         file_name_temp2 = &file_name_temp[0];
-    }
 
-    const char* file_name = file_name_temp2;//to copy the string into file_name
+        const char* file_name_temp3 = file_name_temp2;//to copy the string into file_name
 
+        std :: fstream input_text_customization_test(file_name_temp3, ios :: in);
+        if (input_text_customization_test.fail()){
+            cout<<"failed to open "<<file_name_temp<<endl;
+            open_failed = true;
+        }
+        input_text_customization_test.close();
+        
+        }while(open_failed);
+        cout<<"successfully open"<<endl;
+
+    const char* file_name = file_name_temp2;
     std :: fstream input_text_customization(file_name, ios :: in);
-    
     input_text_customization>>input_size;
 
     for (int i = 0; i < input_size; i++){
@@ -372,6 +382,7 @@ Entry_Array Read_From_Text(void){
         temp.Set_Entry(a, y, m, d, c);
         input_result.append_entry(temp);
     }
+    
     input_text.close();
     input_text_customization.close();
 
@@ -496,6 +507,7 @@ int main(void){
     cout<<"May overwrite existed files "<<endl;
     cout<<"=============WARNING============"<<endl;
     cin >> read;
+    cin.ignore();
     if ((read != 'N')&&(read != 'n')){
         data = Read_From_Text();
     }
