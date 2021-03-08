@@ -295,22 +295,20 @@ void Print_All_Entry(Entry_Array input){
     }
 }
 
-void Save_To_Text(Entry_Array input){
+char* Save_To_Text(Entry_Array input, char* file_name_input, bool saved){
     string file_name_temp = "-1";//the file name temp
-    char file_name_default[10] = {'r', 'e', 's', 'u', 'l', 't', '.', 't', 'x', 't'};
-    //rile_name_dafualt = result.txt
     char* file_name_temp2;
 
-    cout<<"please enter the file name to be saved(for default, please enter -1)"<<endl;
-    cin >> file_name_temp; //input the file name
-
-    if (file_name_temp == "-1"){//test for default setting
-        file_name_temp2 = file_name_default;
+    if (!saved){//let user choose the file name to be saved
+        cout<<"please enter the file name to be saved"<<endl;
+        cin >> file_name_temp; //input the file name
+        file_name_temp2 = &file_name_temp[0];
+        
     }
     else{
-        file_name_temp2 = &file_name_temp[0];
+        file_name_temp2 = file_name_input;
     }
-
+    string file_name_str = file_name_temp2;
     const char* file_name = file_name_temp2;//to copy the string into file_name
 
     std :: fstream ouput_text(file_name, ios :: out);
@@ -324,10 +322,11 @@ void Save_To_Text(Entry_Array input){
         ouput_text<<input.get_comment(i)<<endl;
     }
     ouput_text.close();
-    cout<<"Succesfully saved to file as result.txt"<<endl;
+    cout<<"Succesfully saved to file as "<<file_name_str<<endl;
+    return file_name_temp2;
 }
 
-Entry_Array Read_From_Text(void){
+Entry_Array Read_From_Text(char** file_name_result){
     Entry_Array input_result;//the final result of reading the file
     Entry temp;//the temptation Entry obj. for moving files
     int input_size; // the array_size of the input Entry_Array
@@ -386,6 +385,9 @@ Entry_Array Read_From_Text(void){
     input_text.close();
     input_text_customization.close();
 
+    *file_name_result = file_name_temp2;
+    //change the contents stored in the address which file_name_result pointed to
+    //return the address of the pointer(file_name_temp2)
     return input_result;
 }
 
@@ -500,7 +502,9 @@ int main(void){
     Entry_Array data;
 
     bool quit = false;
+    bool saved = false; //Whether file has been saved
     char read = 'Y';
+    char* file_name = NULL;
     int option = 0;
     cout<<"Read from file?[Y/N]"<<endl;
     cout<<"=============WARNING============"<<endl;
@@ -509,11 +513,22 @@ int main(void){
     cin >> read;
     cin.ignore();
     if ((read != 'N')&&(read != 'n')){
-        data = Read_From_Text();
+        data = Read_From_Text(&file_name);
+        saved = true;//set saved to true since file name is known 
+        if (file_name == NULL){
+            cout<<"file_name is NULL"<<endl;
+        }
     }
     
     while(!quit){
-        cout<<"Choose the operation 1: add entry 11: add monthly entry 2:modify entry 3: delete entry 4:overview 5:report balance 6:save 7:save & quit 8: don't save & quit"<<endl;
+        cout<<"Choose the operation "<<endl;
+        cout<<std::left<<setw(20)<<"1:add entry"<<"11: add monthly entry"<<endl;
+        cout<<"2:modify entry"<<endl;
+        cout<<"3:delete entry"<<endl;
+        cout<<"4:overview"<<endl;
+        cout<<"5:report balance"<<endl;
+        cout<<std::left<<setw(20)<<"6:save"<<"6:save as..."<<endl;
+        cout<<std::left<<setw(20)<<"7:save & quit"<<"71: don't save & quit"<<endl;
         cin >> option;
         switch (option){
             case 1:
@@ -546,18 +561,31 @@ int main(void){
                 Report_Balance(data);
                 break;
             case 6:
-                Save_To_Text(data);
+                //if not saved yet, ask user to input file name
+                if (!saved){
+                    file_name = Save_To_Text(data, NULL, false);
+                }
+                else{
+                    file_name = Save_To_Text(data, file_name, true);
+                }
                 break;
+            case 61:
+                file_name = Save_To_Text(data, file_name, false);
             case 7:
                 cout<<"Are you sure?[Y/N]"<<endl;
                 char sure;
                 cin>>sure;
                 if((sure == 'Y')||(sure == 'y')){
-                    Save_To_Text(data);
+                    if (!saved){
+                    file_name = Save_To_Text(data, NULL, false);
+                    }
+                    else{
+                        file_name = Save_To_Text(data, file_name, true);
+                    }
                     quit = true;
                 }
                 break;
-            case 8:
+            case 71:
                 cout<<"Are you sure? Type 'sure' to quit"<<endl;
                 string sure_drop;
                 cin>>sure_drop;
